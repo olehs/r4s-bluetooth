@@ -109,11 +109,13 @@ You will get back the answers from handle 0x000b
 Commands start with 0x55 byte, and end with 0xaa
 Second byte is a counter, you should increment it with any new request. I don't know yet what happens when you overflow
 Third byte is a command itself
- * 0x05 - switch the kettle on
+ * 0x01 - switch the kettle on to boil
+ * 0x05 - switch the kettle on to keepwarm
  * 0x04 - switch the kettle off
  * 0x06 - request status
  * 0xFF - authorize
- * 
+ 
+ 
 Next go the parameters.
 
 ```

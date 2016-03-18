@@ -3,14 +3,21 @@
 devicemac="$1"
 command="$2"
 
+if [[ $devicemac =~ ^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$ ]]; then
+   echo "Will Control: $devicemac";
+else
+   echo "Uasge <mac> <command>"
+   exit;
+fi
 
-echo "Reading primary info"
+
+#echo "Reading primary info"
 #gatttool -b $devicemac -t random --primary
 
-echo "Reading characteristics info"
+#echo "Reading characteristics info"
 #gatttool -b $devicemac -t random --characteristics
 
-echo "Reading characteristics desc"
+#echo "Reading characteristics desc"
 #gatttool -b $devicemac -t random --char-desc
 
 
