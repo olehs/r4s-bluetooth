@@ -10,12 +10,13 @@ Prerequisits:
    You need bluez installed. Version 4.01 is fine
 
 Usage: 
-*   ./connect.sh [KETTLE MAC] auth
-*   ./connect.sh [KETTLE MAC] status
+*   ./connect.sh [KETTLE MAC] auth 
+*   ./connect.sh [KETTLE MAC] query
+*   ./connect.sh [KETTLE MAC] queryone
 *   ./connect.sh [KETTLE MAC] on
 *   ./connect.sh [KETTLE MAC] off
 
-You can get your  [KETTLE MAC] by entering "bt-device -l"   
+You can get your  [KETTLE MAC] by entering "bt-device -l" 
 
 ## Dumps 
 
