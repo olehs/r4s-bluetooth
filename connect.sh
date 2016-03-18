@@ -3,25 +3,41 @@
 devicemac="$1"
 command="$2"
 
+
+function tracemen()
+{ 
+  echo -e -n $1
+}
+
+function traceme()
+{ 
+  echo -e $1
+}
+
+if [[ $devicemac == "_" ]]; then
+    $devicemac=`cat kettle.mac`
+fi;
+
 if [[ $devicemac =~ ^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$ ]]; then
-   echo "Will Control: $devicemac";
+   traceme "Will Control: $devicemac";
 else
-   echo "Uasge <mac> <command>"
+   traceme "Usage <mac> <command>"
    exit;
 fi
 
 
-#echo "Reading primary info"
+
+traceme "Reading primary info"
 #gatttool -b $devicemac -t random --primary
 
-#echo "Reading characteristics info"
+traceme "Reading characteristics info"
 #gatttool -b $devicemac -t random --characteristics
 
-#echo "Reading characteristics desc"
+traceme "Reading characteristics desc"
 #gatttool -b $devicemac -t random --char-desc
 
 
-#echo "Attempt to write something -> 0x000c"
+traceme "Attempt to write something -> 0x000c"
 #gatttool -b $devicemac -t random --char-write-req --handle=0x000c --value=0100
 
 
@@ -33,9 +49,9 @@ fi
 
 (( i=0 ))
 
-if true; then
+if true; then  # Auth sequence.
   while true; do
-    echo "Attempt to write something -> 0x000c"
+    traceme "Attempt to write something -> 0x000c"
     gatttool -b $devicemac -t random --char-write-req --handle=0x000c --value=0100
     sleep 0.5;
     
@@ -43,7 +59,7 @@ if true; then
     magic=`printf "55%02xffb54c75b1b40c88efaa" $i`
   
     
-    echo "Attempt to write something -> 0x000e ($magic)"
+    traceme "Attempt to write something -> 0x000e ($magic)"
     sleep 0.5;
     gatttool -b $devicemac -t random --char-write-req --handle=0x000e --value=$magic --listen >response  &
     gettpid=$!
@@ -57,16 +73,18 @@ if true; then
     echo -n "REPLY:$reply"
     
     is_authorized=`echo $reply | awk '{print $4}'`
-    echo " <$is_authorized> "
+    traceme " <$is_authorized> "
     if [[ $is_authorized == "01" ]]; then 
-      echo  "Authorized"
+      traceme  "Authorized"
       break;
-    else
-      echo  "HOLD + button"
+    fi;
+    
+    if [[ $is_authorized == "00" ]]; then
+      traceme  "HOLD '+' button"
     fi;
     
     if [[ $reply == "" ]]; then
-      echo "No reply"
+      traceme "No reply"
       (( i = (i + 1) % 256 ));
     else    
       (( i = (i + 1) % 256 ));
@@ -74,7 +92,7 @@ if true; then
   done;
 fi;
   
-echo "Ok";
+traceme "Ok";
 
 
 # Requesting status
@@ -135,7 +153,7 @@ if [[ $command == "on" ]]; then
       #echo "Attempt to write something -> 0x000c"
       gatttool -b $devicemac -t random --char-write-req --handle=0x000c --value=0100
       sleep 0.5;
-      magic=`printf "55%02x01aa" $i`
+      magic=`printf "55%02x0500000000aa" $i`
       
       #echo "Attempt to write something -> 0x000e ($magic)"
       sleep 0.5;
@@ -244,3 +262,4 @@ if [[ $command == "off" ]]; then
       fi        
    done;
 fi;
+

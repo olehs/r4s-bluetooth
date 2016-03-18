@@ -109,8 +109,8 @@ You will get back the answers from handle 0x000b
 Commands start with 0x55 byte, and end with 0xaa
 Second byte is a counter, you should increment it with any new request. I don't know yet what happens when you overflow
 Third byte is a command itself
- * 0x01 - switch the kettle on to boil
- * 0x05 - switch the kettle on to keepwarm
+ * 0x01 - happens sometimes, unknown
+ * 0x05 - switch the kettle on to keepwarm (on with 0 temperature)
  * 0x04 - switch the kettle off
  * 0x06 - request status
  * 0xFF - authorize
@@ -155,7 +155,7 @@ Send the request again with incrementing counter. Meanwhile hold "+" key. At som
 Next time with the same key you should be able to connect from the first attempt.
 In the auth state you can issue next commands.
 
-#### ON command
+#### Unknown command usually at start
 
 ```
    ->  55:<counter>:01:aa
@@ -167,8 +167,8 @@ reply example
 ```
 request examples
    ->  55:<counter>:05:00:00:28:00:aa
-   ->  55:<counter>:05:00:00:00:00:aa
-   ->  55:<counter>:05:01:00:5f:00:aa  - keepwarm at 95
+   ->  55:<counter>:05:00:00:00:00:aa - just switch on.
+   ->  55:<counter>:05:01:00:5f:00:aa - keepwarm at 95
    
        55:<counter>:05:00:00:<keep warm temp>:00:aa
    
