@@ -13,6 +13,7 @@ Usage:
 *   ./connect.sh [KETTLE MAC] auth 
 *   ./connect.sh [KETTLE MAC] query
 *   ./connect.sh [KETTLE MAC] queryone
+*   ./connect.sh [KETTLE MAC] keeptemp <temp>
 *   ./connect.sh [KETTLE MAC] on
 *   ./connect.sh [KETTLE MAC] off
 
@@ -153,8 +154,20 @@ Next time with the same key you should be able to connect from the first attempt
 In the auth state you can issue next commands.
 
 #### ON command
+
 ```
+   ->  55:<counter>:01:aa
+reply example
+   <-  55:<counter>:01:02:06:aa
+```
+
+#### BOLING AND HEATING command
+```
+request examples
    ->  55:<counter>:05:00:00:28:00:aa
+   ->  55:<counter>:05:00:00:00:00:aa
+   ->  55:<counter>:05:01:00:5f:00:aa  - keepwarm at 95
+   
        55:<counter>:05:00:00:<keep warm temp>:00:aa
    
 reply example   
@@ -172,13 +185,15 @@ reply example
 ```
    -> 55:<counter>:06:aa 
 reply examples:
+   <- 55:<counter>:06:00:00:00:00:00:0c:00:00:00:00:51:00:00:00:00:00:aa  - kettle is on in boiling 
+
    <- 55:<counter>:06:00:00:28:00:00:0c:00:01:02:00:33:00:00:00:00:00:aa  - kettle is on
    <- 55:<counter>:06:00:00:00:00:00:0c:00:00:00:00:3e:00:00:00:00:00:aa  - kettle is off
    <- 55:<counter>:06 00 00 28 00 00 0c 00 01 00 00 64 00 00 00 00 00 aa
    
    <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 64 00 00 00 00 00 aa  - kettle finished boiling ()
    <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 63 00 00 00 00 00 aa  - a while after finished boiling
-	1     2      3  4            5  6  7  8  9  10 11 12        13 14 
+	1     2      3  4            5  6                7  8  9  10 11 12        13 14 
 	55:<counter>:06:<keep warm?>:00:<keepwarm temp?>:00:00:0c:00:01:<heater?>:00:<temp>:00:00:00:00:00:aa
 
 <heater? - not sure>  

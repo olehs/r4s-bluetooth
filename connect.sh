@@ -99,6 +99,7 @@ if [[ $command == "query" || $command == "queryone" ]]; then
       echo "No reply"
       (( i = (i + 1) % 256 ));
     else    
+      kettle_keeptemp=`echo $reply | awk '{print $6}'`    
       kettle_on=`echo $reply | awk '{print $12}'`
       kettle_temp=`echo $reply | awk '{print $14}'`
     
@@ -109,8 +110,8 @@ if [[ $command == "query" || $command == "queryone" ]]; then
       fi
     
       echo -n " "  
-      echo -n "$((16#$kettle_temp))C"
-      echo -n " "  
+      echo -n "$((16#$kettle_temp))C "
+      echo -n "Will keep: $((16#$kettle_keeptemp))C "
       echo "REPLY:$reply"
       
       if [[ $command == "queryone" ]]; then
@@ -127,7 +128,47 @@ if [[ $command == "on" ]]; then
       #echo "Attempt to write something -> 0x000c"
       gatttool -b $devicemac -t random --char-write-req --handle=0x000c --value=0100
       sleep 0.5;
-      magic=`printf "55%02x0500002800aa" $i`
+      magic=`printf "55%02x01aa" $i`
+      
+      #echo "Attempt to write something -> 0x000e ($magic)"
+      sleep 0.5;
+      gatttool -b $devicemac -t random --char-write-req --handle=0x000e --value=$magic --listen >response  &
+      gettpid=$!
+      #echo "Forked to pid $gettpid"
+      sleep 0.5;
+      #echo "Killing to pid $gettpid"
+      kill $gettpid  >/dev/null 2>/dev/null
+      wait $gettpid 2>/dev/null
+      response=`cat response`;
+      reply=`echo $response | grep "value:" | sed "s/.*value: \(.*\)/\\1/g"`
+      
+      is_on=`echo $reply | awk '{print $4}'`
+      echo " <$is_on> "
+      if [[ $is_on == "01" ]]; then 
+	echo  "Success"
+	break;
+      else
+	echo  "Trying again..."
+      fi;
+      
+      if [[ $reply == "" ]]; then
+	echo "No reply"
+	(( i = (i + 1) % 256 ));
+      else    
+	(( i = (i + 1) % 256 ));
+      fi        
+   done;
+    
+fi;
+
+if [[ $command == "keeptemp" ]]; then
+    keep_temp="$3"
+
+    while true; do
+      #echo "Attempt to write something -> 0x000c"
+      gatttool -b $devicemac -t random --char-write-req --handle=0x000c --value=0100
+      sleep 0.5;
+      magic=`printf "55%02x050000%02x00aa" $i $keep_temp`
       
       #echo "Attempt to write something -> 0x000e ($magic)"
       sleep 0.5;
