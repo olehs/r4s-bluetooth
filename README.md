@@ -130,14 +130,13 @@ Next goes the data.
  -> 55:<counter>:ff:<8 bytes. Seem random. ID? MAC?>:aa
 ```
 
- If you are not yet authorized (you need to hold "+" on the kettle for this) the kettle will reply
+If you are not yet authorized (you need to hold "+" on the kettle for this) the kettle will reply
 
 ```
  <- 55:<counter>:ff:00:aa  
 ```
-
-    Send the request again with incrementing counter. Meanwhile hold "+" key. At some point the auth will be passed. And you will get:
-    
+Send the request again with incrementing counter. Meanwhile hold "+" key. At some point the auth will be passed. And you will get:
+   
 ```
  <- 55:<counter>:ff:01:aa  
 ```
