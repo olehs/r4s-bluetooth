@@ -87,31 +87,6 @@ handle = 0x000a, char properties = 0x10, char value handle = 0x000b, uuid = 6e40
 handle = 0x000d, char properties = 0x0c, char value handle = 0x000e, uuid = 6e400002-b5a3-f393-e0a9-e50e24dcca9e  write
 ```
    
-## Raw analisis
-   
-```   
-No connect status
-   0x000c  -> 0x0100
-   
-   0x000e  -> 55:00:ff:b5:4c:75:b1:b4:0c:88:ef:aa
-	      55:<counter>:ff:b5:4c:75:b1:b4:0c:88:ef:aa
-	      
-	      This changes from one request to the other. Even on one device 
-	      1: 55:01:ff:55:3a:57:47:f8:c2:62:4a:aa
-	      2: 55:00:ff:b5:4c:75:b1:b4:0c:88:ef:aa
-	      
-	      55:<counter>:ff:<8 bytes. Seem random. ID? MAC?>:aa
-	      
-	      
-	   <- 55:<counter>:ff:00:aa  
-	   
------------------------------------------------------------------
-	      55:0e:ff:55:3a:57:47:f8:c2:62:4a:aa
-	      55:0e:ff:01:aa  - auth passed
- 
-	   
-
-```
 
 ### Protocol summary
 
@@ -131,6 +106,7 @@ Third byte is a command itself
  * 0x04 - switch the kettle off
  * 0x06 - request status
  * 0xFF - authorize
+ * 
 Next go the parameters.
 
 ```
@@ -141,10 +117,28 @@ start   |     |  end
         command id
 ```
 
-As a reply you will recive a sequence that start with 0x55 byte, and end with 0xaa
+As a reply you will recive a sequence that start with 0x55 byte, and end with 0xAA
 Second byte is a counter which is the same as in the request it replies to.
 Third byte is the command - same as in the request. It depends on the command.
 Next goes the data.
+
+#### AUTH
+ I can guess you should do the following. Generate a 8byte random ID. This will be your key. 
+ Send auth command, starting with counter 0
+```
+ -> 55:<counter>:ff:<8 bytes. Seem random. ID? MAC?>:aa
+```
+ If you are not yet authorized (you need to hold "+" on the kettle for this) the kettle will reply
+```
+ <- 55:<counter>:ff:00:aa  
+```
+    Send the request again with incrementing counter. Meanwhile hold "+" key. At some point the auth will be passed. And you will get:
+```
+ <- 55:<counter>:ff:01:aa  
+```
+    
+Next time with the same key you should be able to connect from the first attempt.
+In the auth state you can issue next commands.
 
 #### ON command
 ```
