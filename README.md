@@ -1,17 +1,21 @@
 # r4s-bluetooth
 Hacking Ready For Sky (R4S) home appliances
 
-This repository holds some data for controlling r4s SkyKettle. 
+This repository holds some data for controlling Redmond SkyKettle RK-M171S from GNU/Linux
 
 I welcome suggestions and ideas for simplification and making code more reliable.
 Using script wrapper around gatttool is so far the simplest approach. But it is terribly ugly.
 
+Prerequisits:
+   You need bluez installed. Version 4.01 is fine
+
 Usage: 
-*   ./connect.sh auth
-*   ./connect.sh status
-*   ./connect.sh on
-*   ./connect.sh off
-   
+*   ./connect.sh [KETTLE MAC] auth
+*   ./connect.sh [KETTLE MAC] status
+*   ./connect.sh [KETTLE MAC] on
+*   ./connect.sh [KETTLE MAC] off
+
+You can get your  [KETTLE MAC] by entering "bt-device -l"   
 
 ## Dumps 
 
@@ -83,8 +87,10 @@ handle = 0x000a, char properties = 0x10, char value handle = 0x000b, uuid = 6e40
 handle = 0x000d, char properties = 0x0c, char value handle = 0x000e, uuid = 6e400002-b5a3-f393-e0a9-e50e24dcca9e  write
 ```
    
+## Raw analisis
    
-No connect 
+```   
+No connect status
    0x000c  -> 0x0100
    
    0x000e  -> 55:00:ff:b5:4c:75:b1:b4:0c:88:ef:aa
@@ -101,37 +107,78 @@ No connect
 	   
 -----------------------------------------------------------------
 	      55:0e:ff:55:3a:57:47:f8:c2:62:4a:aa
-	      55:0e:ff:01:aa
+	      55:0e:ff:01:aa  - auth passed
  
 	   
-	   
-	   
-after auth
 
-	   -> 55:21:06:aa 
-	      55:<counter>:06:aa 
-	         status request
-	        
-           <- 55:27:06:00:00:28:00:00:0c:00:01:02:00:33:00:00:00:00:00:aa
-              55 08 06 00 00 00 00 00 0c 00 00 00 00 3e 00 00 00 00 00 aa
-              
-               1    2      3  4  5  6  7  8  9  10 11 12            13 14 
-              
-              55:<counter>:06:00:00:28:00:00:0c:00:01:<heater>:00:<temp?>:00:00:00:00:00:aa
-                
-              <heater>  
-                  00 - off
-                  02 - on
-              <temp>
-                  temperature in C
-              
+```
 
-On
-          -> 55:0e:05:00:00:28:00:aa
-          <- 55:0e:05:01:aa
-              
-Off 
-          -> 55:15:04:aa
-          <- 55:15:04:01:aa   
+### Protocol summary
+
+To start talking to device, you need to connect and write 0x0100 to handle 0x000c.
+This needs to be done after every reconnect.
+Gatttool doesn't allow you to know when reconnect happend. So I send it every time.
+
+Now you can send commands to handle 0x000e
+You will get back the answers from handle 0x000b
+
+#### Command structure
+
+Commands start with 0x55 byte, and end with 0xaa
+Second byte is a counter, you should increment it with any new request. I don't know yet what happens when you overflow
+Third byte is a command itself
+ * 0x05 - switch the kettle on
+ * 0x04 - switch the kettle off
+ * 0x06 - request status
+ * 0xFF - authorize
+Next go the parameters.
+
+```
+  0x55 0x76 0x06  0xaa
+   |    |     |   |
+start   |     |  end
+    counter   |
+        command id
+```
+
+As a reply you will recive a sequence that start with 0x55 byte, and end with 0xaa
+Second byte is a counter which is the same as in the request it replies to.
+Third byte is the command - same as in the request. It depends on the command.
+Next goes the data.
+
+#### ON command
+```
+   ->  55:<counter>:05:00:00:28:00:aa
+reply example   
+   <-  55:<counter>:05:01:aa    // 01 status meens OK
+```
+
+#### OFF command
+```
+   ->  55:<counter>:04:aa
+reply example   
+   <-  55:<counter>:04:01:aa       // 01 status meens OK
+```
+
+#### STATUS command
+```
+   -> 55:<counter>:06:aa 
+reply examples:
+   <- 55:<counter>:06:00:00:28:00:00:0c:00:01:02:00:33:00:00:00:00:00:aa  - kettle is on
+   <- 55:<counter>:06:00:00:00:00:00:0c:00:00:00:00:3e:00:00:00:00:00:aa  - kettle is off
+   <- 55:<counter>:06 00 00 28 00 00 0c 00 01 00 00 64 00 00 00 00 00 aa
    
+   <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 64 00 00 00 00 00 aa  - kettle finished boiling ()
+   <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 63 00 00 00 00 00 aa  - a while after finished boiling
+	1     2      3  4            5  6  7  8  9  10 11 12        13 14 
+	55:<counter>:06:<keep warm?>:00:28:00:00:0c:00:01:<heater?>:00:<temp>:00:00:00:00:00:aa
+
+<heater? - not sure>  
+  00 - off
+  02 - on
+<temp>
+  temperature in C
+
+```
+
 
