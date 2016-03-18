@@ -155,6 +155,8 @@ In the auth state you can issue next commands.
 #### ON command
 ```
    ->  55:<counter>:05:00:00:28:00:aa
+       55:<counter>:05:00:00:<keep warm temp>:00:aa
+   
 reply example   
    <-  55:<counter>:05:01:aa    // 01 status meens OK
 ```
@@ -177,7 +179,7 @@ reply examples:
    <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 64 00 00 00 00 00 aa  - kettle finished boiling ()
    <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 63 00 00 00 00 00 aa  - a while after finished boiling
 	1     2      3  4            5  6  7  8  9  10 11 12        13 14 
-	55:<counter>:06:<keep warm?>:00:28:00:00:0c:00:01:<heater?>:00:<temp>:00:00:00:00:00:aa
+	55:<counter>:06:<keep warm?>:00:<keepwarm temp?>:00:00:0c:00:01:<heater?>:00:<temp>:00:00:00:00:00:aa
 
 <heater? - not sure>  
   00 - off
