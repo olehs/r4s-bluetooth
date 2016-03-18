@@ -50,10 +50,11 @@ Insert dmesg
 
 ## Protocol 
 
-  Protocol had been reversed with the following techique. Dumps were made with "Enable Bluetoog HCI snoop log". 
-  Analised with wireshark
+  Protocol had been reversed with the following techique. Dumps were made with "Enable Bluetoog HCI snoop log" Android feature. Analised then with wireshark
   
 ## Bluetooth level
+ 
+ Device info:
   
  ```
  [E7:5A:53:79:82:A4]
@@ -67,9 +68,11 @@ Insert dmesg
   Blocked: 0 [rw]
   Connected: 0
   UUIDs: [00001800-0000-1000-8000-00805f9b34fb, 00001801-0000-1000-8000-00805f9b34fb, 6e400001-b5a3-f393-e0a9-e50e24dcca9e]
+```
 
-  
-  
+Primary handles
+
+```
 attr handle = 0x0001, end grp handle = 0x0007 uuid: 00001800-0000-1000-8000-00805f9b34fb
 attr handle = 0x0008, end grp handle = 0x0008 uuid: 00001801-0000-1000-8000-00805f9b34fb
 attr handle = 0x0009, end grp handle = 0xffff uuid: 6e400001-b5a3-f393-e0a9-e50e24dcca9e
@@ -77,9 +80,11 @@ attr handle = 0x0009, end grp handle = 0xffff uuid: 6e400001-b5a3-f393-e0a9-e50e
 00001800-0000-1000-8000-00805f9b34fb  Generic Access
 00001800-0000-1000-8000-00805f9b34fb  Generic Attribute
 6e400001-b5a3-f393-e0a9-e50e24dcca9e  UART Service
+```
 
+Detailed capabilites:
 
-
+```
 handle = 0x0002, char properties = 0x0a, char value handle = 0x0003, uuid = 00002a00-0000-1000-8000-00805f9b34fb read write
 handle = 0x0004, char properties = 0x02, char value handle = 0x0005, uuid = 00002a01-0000-1000-8000-00805f9b34fb read
 handle = 0x0006, char properties = 0x02, char value handle = 0x0007, uuid = 00002a04-0000-1000-8000-00805f9b34fb read
@@ -91,7 +96,7 @@ handle = 0x000d, char properties = 0x0c, char value handle = 0x000e, uuid = 6e40
 
 ### Protocol summary
 
-To start talking to device, you need to connect and write 0x0100 to handle 0x000c.
+To start talking to device, you need to connect and write 0x0100 to handle 0x000c (is not listed by the device?).
 This needs to be done after every reconnect.
 Gatttool doesn't allow you to know when reconnect happend. So I send it every time.
 
@@ -125,6 +130,8 @@ Next goes the data.
 
 #### AUTH
  I can guess you should do the following. Generate a 8byte random ID. This will be your key. 
+ I don't know yet if any key is ok. These are - 55:3a:57:47:f8:c2:62:4a, b5:4c:75:b1:b4:0c:88:ef
+ 
  Send auth command, starting with counter 0
 
 ```
