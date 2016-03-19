@@ -21,10 +21,14 @@ You can get your  [KETTLE MAC] by entering "bt-device -l"
 
 ## Dumps 
 
+You don't need to dump anything, you can just reverse the application itself. Later data had been acquired with decompile method
+
 * dump/auth.on.off.bin 
     Initiate an auth from application. Hold "+" on kettle. Switch kettle "ON". Press "OFF" just a second before 100C
 * dump/auth.bin  
     Initiate an auth from application. do nothing on kettle
+    
+
 
 ## Hardware
 
@@ -195,15 +199,14 @@ reply examples:
    
    <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 64 00 00 00 00 00 aa  - kettle finished boiling ()
    <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 63 00 00 00 00 00 aa  - a while after finished boiling
-	1     2      3  4            5  6                7  8  9  10 11 12        13 14 
-	55:<counter>:06:<keep warm?>:00:<keepwarm temp?>:00:00:0c:00:01:<heater?>:00:<temp>:00:00:00:00:00:aa
-
-<heater? - not sure>  
-  00 - off
-  02 - on
-<temp>
-  temperature in C
+   
+ external num	1     2      3  4            5  6                7  8  9  10 11 12        13 14 
+ internal num                   0            1  2                3  4  5  6  7  8         9  10     11  
+   	        55:<counter>:06:<keep warm?>:00:<keepwarm temp?>:00:00:0c:00:01:<heater?>:00:<temp>:00:00:00:00:00:aa
 
 ```
 
+| byte |     |         |
+|   4  |  0  | Program | 
+|   5  |  1  |         |
 
