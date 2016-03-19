@@ -201,12 +201,23 @@ reply examples:
    <- 55:<counter>:06 01 00 28 00 00 0c 00 01 02 00 63 00 00 00 00 00 aa  - a while after finished boiling
    
  external num	1     2      3  4            5  6                7  8  9  10 11 12        13 14 
- internal num                   0            1  2                3  4  5  6  7  8         9  10     11  
+ internal num                  0            1  2               3  4  5  6  7  8         9  10     11  
    	        55:<counter>:06:<keep warm?>:00:<keepwarm temp?>:00:00:0c:00:01:<heater?>:00:<temp>:00:00:00:00:00:aa
 
 ```
 
-| byte |     |         |
-|   4  |  0  | Program | 
-|   5  |  1  |         |
+
+| Byte ext | Byte int | Action         |
+| ---------|----------| ---------------|
+| 4        |    0     | Program        |
+| 5        |    1     |                |
+| 6        |    2     | Target Temperature  |
+| 7        |    3     |                |
+| 8        |    4     |                |
+| 9        |    5     | Remaining hours   |
+|10        |    6     | Remaining minutes |
+|11        |    7     | Heater on      |
+|12        |    8     | State          |
+|13        |    9     | Error status   |
+|14        |   10     | Current Temp   |
 
